@@ -1,8 +1,14 @@
 async function startGame() {
     // YOUR CODE BELOW 🚀
+    let color;
 
-    cat.goTo(0, 0);
-   
+    dog.whenThisSpriteClicked(() => {
+        color = ask("What's your favorite color?")
+        document.body.style.background = color
+        playSound('meow.wav')
+    })
+
+
 }
 
 startGame();

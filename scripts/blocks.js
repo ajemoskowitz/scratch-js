@@ -1,7 +1,7 @@
 class Actor {
     constructor(element) {
         this.element = element;
-        element.width = 100;
+        // element.width = 100;
         this.width = element.width;
         this.nextCostumeNum = 2;
         this.lastCostume = 2;
@@ -50,12 +50,23 @@ class Actor {
     }
 
     goTo(x=0, y=0) {
-        this.element.style.left = `${window.innerWidth / 2 - this.element.width / 2 + x}px`;
-        this.element.style.top = `${window.innerHeight / 2 - this.element.height / 2 - y}px`;
+        if (x === 'mouse') {
+            this.element.style.left = `${mouseX - this.element.width / 2}px`;
+            this.element.style.top = `${mouseY - this.element.width / 2}px`;
+        } else if (x === 'random') {
+            this.element.style.left = `${pickRandom(0, window.innerWidth)}px`;
+            this.element.style.top = `${pickRandom(0, window.innerHeight)}px`;
+        } else if (typeof x === 'string') {
+            const objectToAttach = document.getElementById(x).getBoundingClientRect();
+            this.element.style.left = `${window.innerWidth / 2 - this.element.width / 2 + x}px`;
+            this.element.style.top = `${window.innerHeight / 2 - this.element.height / 2 - y}px`;
+        } else {
+            this.element.style.left = `${window.innerWidth / 2 - this.element.width / 2 + x}px`;
+            this.element.style.top = `${window.innerHeight / 2 - this.element.height / 2 - y}px`;
+        }
     }
 
     changeXBy(x=10) {
-        console.log("x of cat: "+this.element.getBoundingClientRect().x)
         this.element.style.left = `${this.element.getBoundingClientRect().x + x}px`;
     }
 
@@ -119,12 +130,6 @@ class Actor {
         this.element.style.visibility = "hidden";
     }
 
-    async forever(task) {
-        setInterval(()=> {
-            task();
-        }, 30);
-    }
-
     async repeat(task, iterations=10) {
         let counter = 1;
         while(counter <= iterations) {
@@ -148,29 +153,12 @@ class Actor {
         return clone;
     }
 
-    ask(question) {
-        return prompt(question);
-    }
-
-    async whenPressed(key, task) {
-        document.addEventListener('keydown', (e) => {
-            if(e.key === keyConversions[key]) {
-                task();
-            }
-        })
-    }
-
     nextCostume() {         
         this.element.attributes.src.value = `./sprites/${this.element.id}/costume${this.nextCostumeNum}.svg`
         this.nextCostumeNum += 1;
         if(this.nextCostumeNum == this.lastCostume) {
             this.nextCostumeNum = 1;
         }
-    }
-
-    playSound(sound) {
-        const audio = new Audio(`./sounds/${sound}`);
-        audio.play();
     }
 
     whenThisSpriteClicked(task) {
@@ -203,7 +191,38 @@ class Actor {
             })
         },10)
     }
+
+    isTouching(object) {
+        if (object === 'mouse') {
+            const withinX = mouseX >= this.element.getBoundingClientRect().x && mouseX <= this.element.getBoundingClientRect().x + this.element.width;
+            const withinY = mouseY >= this.element.getBoundingClientRect().y && mouseY <= this.element.getBoundingClientRect().y + this.element.height;
+            return withinX && withinY;
+        } else if (object === 'edge') {
+            const thisRect = this.element.getBoundingClientRect();
+            const overlap = (window.innerWidth < thisRect.right || 
+                0 > thisRect.left || 
+                0 > thisRect.top || 
+                window.innerHeight < thisRect.bottom)
+
+            return overlap;
+
+        } else {
+            const objectToTouch = document.getElementById(object).getBoundingClientRect();
+            const thisRect = this.element.getBoundingClientRect();
+            const overlap = !(objectToTouch.right < thisRect.left || 
+                objectToTouch.left > thisRect.right || 
+                objectToTouch.bottom < thisRect.top || 
+                objectToTouch.top > thisRect.bottom)
+            
+            return overlap;
+        }
+    }
 }
+
+function ask(question) {
+    return prompt(question);
+}
+
 
 function switchBackdropTo(backdrop) {
     document.body.style.backgroundImage = `url(backdrops/${backdrop}.jpg)`;
@@ -220,3 +239,21 @@ function pickRandom(from, to) {
     return tempNum;
 }
 
+async function forever(task) {
+    setInterval(()=> {
+        task();
+    }, 30);
+}
+
+async function whenPressed(key, task) {
+    document.addEventListener('keydown', (e) => {
+        if(e.key === keyConversions[key]) {
+            task();
+        }
+    })
+}
+
+function playSound(sound) {
+    const audio = new Audio(`./sounds/${sound}`);
+    audio.play();
+}
