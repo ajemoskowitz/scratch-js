@@ -102,7 +102,7 @@ pickRandom(5, 10)
 await wait(seconds)
 
 // here, your code will wait 3 seconds before the dog barks
-await wait(3)
+await dog.wait(3)
 dog.say('Bark!')
 ```
 

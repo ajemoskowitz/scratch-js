@@ -1,14 +1,43 @@
 async function startGame() {
-    // YOUR CODE BELOW 🚀
-    let color;
+    // FOR HELP, GO TO: README.md
+    // 👇 WRITE YOUR CODE BELOW THIS PART 👇
 
-    dog.whenThisSpriteClicked(() => {
-        color = ask("What's your favorite color?")
-        document.body.style.background = color
-        playSound('meow.wav')
-    })
+    dog.goTo();
+    dog.say('hello');
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // 👆 WRITE YOUR CODE ABOVE THIS PART 👆
+    // 🛑 STOP 🛑
 }
 
+// DON'T CHANGE THIS ❌❌❌
 startGame();
+// DON'T CHANGE THIS ❌❌❌

@@ -1,6 +1,9 @@
 document.querySelectorAll('.actor').forEach(actor => {
-    actor.style.position = "relative";
+    actor.style.position = "absolute";
     window[actor.id] = new Actor(actor); 
+    let sizeNode = document.createAttribute('data-size');
+    sizeNode.value = '100';
+    actor.attributes.setNamedItem(sizeNode);
 })
 
 let mouseX;

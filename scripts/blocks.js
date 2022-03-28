@@ -1,19 +1,21 @@
 class Actor {
     constructor(element) {
         this.element = element;
-        // element.width = 100;
         this.width = element.width;
-        this.nextCostumeNum = 2;
-        this.lastCostume = 2;
+        this.direction = this.getRotationAngle() + 90;
+        this.size = Number(this.element.dataset.size);
+        this.xPosition = (element.getBoundingClientRect().x + element.width / 2) - (window.innerWidth / 2);
+        this.yPosition = ((element.getBoundingClientRect().y + element.height / 2) - (window.innerHeight / 2)) * -1;
+        this.element.style.transform = `scale(${this.size / 100}) rotate(${this.getRotationAngle()}deg)`;
     }
 
     move(steps=10) {
-        // const currentAngle = this.getRotationAngle();
-        // console.log("current angle: " + currentAngle)
-        // console.log("sin function returns: " + Math.sin(currentAngle * Math.PI/180) * steps)
+        const currentAngle = this.getRotationAngle();
+        console.log("current angle: " + currentAngle);
+        console.log("sin function returns: " + Math.sin(currentAngle * Math.PI/180) * steps);
         // this.changeXBy(Math.sin(currentAngle * Math.PI/180) * steps)
         // this.changeYBy(Math.cos(currentAngle * Math.PI/180) * steps)
-        this.element.style.left = Number(this.element.style.left.substr(0, this.element.style.left.length - 2)) + steps + "px"
+        // this.element.style.left = Number(this.element.style.left.substr(0, this.element.style.left.length - 2)) + steps + "px"
     }
 
     getRotationAngle() {
@@ -37,6 +39,10 @@ class Actor {
         return (angle < 0) ? angle +=360 : angle;
     }
 
+    getSize() {
+
+    }
+
     turnClockwise(degrees=15) {
         this.element.style.transform = `rotate(${this.getRotationAngle() + degrees }deg)`
     }
@@ -46,23 +52,23 @@ class Actor {
     }
 
     pointInDirection(degrees=90) {
-        this.element.style.transform = `rotate(${degrees }deg)`
+        this.element.style.transform = `rotate(${degrees}deg)`
     }
 
     goTo(x=0, y=0) {
         if (x === 'mouse') {
-            this.element.style.left = `${mouseX - this.element.width / 2}px`;
-            this.element.style.top = `${mouseY - this.element.width / 2}px`;
+            this.element.style.left = `${mouseX - this.width / 2}px`;
+            this.element.style.top = `${mouseY - this.width / 2}px`;
         } else if (x === 'random') {
             this.element.style.left = `${pickRandom(0, window.innerWidth)}px`;
             this.element.style.top = `${pickRandom(0, window.innerHeight)}px`;
         } else if (typeof x === 'string') {
             const objectToAttach = document.getElementById(x).getBoundingClientRect();
-            this.element.style.left = `${window.innerWidth / 2 - this.element.width / 2 + x}px`;
+            this.element.style.left = `${window.innerWidth / 2 - this.width / 2 + x}px`;
             this.element.style.top = `${window.innerHeight / 2 - this.element.height / 2 - y}px`;
         } else {
-            this.element.style.left = `${window.innerWidth / 2 - this.element.width / 2 + x}px`;
-            this.element.style.top = `${window.innerHeight / 2 - this.element.height / 2 - y}px`;
+            this.element.style.left = `${(window.innerWidth / 2 - this.width / 2) + x}px`;
+            this.element.style.top = `${(window.innerHeight / 2 - this.element.height / 2) - y}px`;
         }
     }
 
@@ -75,11 +81,11 @@ class Actor {
     }
 
     setXTo(x=0) {
-        this.element.style.left = `${window.innerWidth / 2 - this.element.width / 2 + x}px`;
+        this.goTo(x, this.yPosition);
     }
 
     setYTo(y=0) {
-        this.element.style.top = `${window.innerHeight / 2 - this.element.height / 2 - y}px`;
+        this.goTo(this.xPosition, y);
     }
 
     sleep(seconds=1) {
@@ -101,7 +107,7 @@ class Actor {
         newMessage.setAttribute('data-actor', this.element.id);
         newMessage.innerText = message;
         newMessage.style.position = 'relative';
-        newMessage.style.left = this.element.getBoundingClientRect().x - this.element.width / 2 + "px";
+        newMessage.style.left = this.element.getBoundingClientRect().x - this.width / 2 + "px";
         newMessage.style.top = this.element.getBoundingClientRect().y - this.element.height * 1.5  + "px";
         document.body.insertAdjacentElement('beforeend', newMessage);
 
@@ -115,11 +121,15 @@ class Actor {
     }
 
     changeSizeBy(num=10) {
-        this.element.width += num;
+        if (this.size + num <= 0) {
+            this.element.dataset.size = 0;
+        } else {
+            this.element.dataset.size = this.size + num;
+        }
     }
 
     setSizeBy(percent=100) {
-        this.element.width = this.width * percent / 100;
+        this.width = this.width * percent / 100;
     }
 
     show() {
@@ -145,20 +155,12 @@ class Actor {
         clone.classList.add('actor');
         clone.src = actor.element.attributes.src.value;
         console.log(actor.element.attributes.src.value)
-        clone.style.position = 'relative';
+        clone.style.position = 'absolute';
         clone.style.left = this.element.getBoundingClientRect().x + "px";
         clone.style.top = this.element.getBoundingClientRect().y + "px";
         document.body.insertAdjacentElement('beforeend', clone);
 
         return clone;
-    }
-
-    nextCostume() {         
-        this.element.attributes.src.value = `./sprites/${this.element.id}/costume${this.nextCostumeNum}.svg`
-        this.nextCostumeNum += 1;
-        if(this.nextCostumeNum == this.lastCostume) {
-            this.nextCostumeNum = 1;
-        }
     }
 
     whenThisSpriteClicked(task) {

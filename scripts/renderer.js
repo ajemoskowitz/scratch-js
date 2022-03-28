@@ -9,7 +9,7 @@ setInterval(() => {
 
     // initialize actors
     document.querySelectorAll('.actor').forEach(actor => {
-        actor.style.position = "relative";
+        actor.style.position = "absolute";
         window[actor.id] = new Actor(actor); 
     })
 
