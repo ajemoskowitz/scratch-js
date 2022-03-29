@@ -3,7 +3,10 @@ document.querySelectorAll('.actor').forEach(actor => {
     window[actor.id] = new Actor(actor); 
     let sizeNode = document.createAttribute('data-size');
     sizeNode.value = '100';
+    let angleNode = document.createAttribute('data-angle');
+    angleNode.value = '90';
     actor.attributes.setNamedItem(sizeNode);
+    actor.attributes.setNamedItem(angleNode);
 })
 
 let mouseX;

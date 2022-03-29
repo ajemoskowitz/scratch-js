@@ -2,11 +2,11 @@ class Actor {
     constructor(element) {
         this.element = element;
         this.width = element.width;
-        this.direction = this.getRotationAngle() + 90;
+        this.direction = Number(this.element.dataset.angle);
         this.size = Number(this.element.dataset.size);
         this.xPosition = (element.getBoundingClientRect().x + element.width / 2) - (window.innerWidth / 2);
         this.yPosition = ((element.getBoundingClientRect().y + element.height / 2) - (window.innerHeight / 2)) * -1;
-        this.element.style.transform = `scale(${this.size / 100}) rotate(${this.getRotationAngle()}deg)`;
+        this.element.style.transform = `scale(${this.size / 100}) rotate(${this.direction - 90}deg)`;
     }
 
     move(steps=10) {
@@ -39,20 +39,16 @@ class Actor {
         return (angle < 0) ? angle +=360 : angle;
     }
 
-    getSize() {
-
-    }
-
     turnClockwise(degrees=15) {
-        this.element.style.transform = `rotate(${this.getRotationAngle() + degrees }deg)`
+        this.element.dataset.angle = Number(this.element.dataset.angle) + degrees;
     }
 
     turnCounterclockwise(degrees=15) {
-        this.element.style.transform = `rotate(${this.getRotationAngle() - degrees }deg)`
+        this.element.dataset.angle = Number(this.element.dataset.angle) - degrees;
     }
 
     pointInDirection(degrees=90) {
-        this.element.style.transform = `rotate(${degrees}deg)`
+        this.element.dataset.angle = degrees;
     }
 
     goTo(x=0, y=0) {
@@ -225,9 +221,8 @@ function ask(question) {
     return prompt(question);
 }
 
-
 function switchBackdropTo(backdrop) {
-    document.body.style.backgroundImage = `url(backdrops/${backdrop}.jpg)`;
+    document.body.style.backgroundImage = `url(backdrops/${backdrop})`;
 }
 
 function pickRandom(from, to) {
