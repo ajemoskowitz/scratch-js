@@ -2,7 +2,7 @@ async function startGame() {
     // FOR HELP, GO TO: README.md
     // 👇 WRITE YOUR CODE BELOW THIS PART 👇
 
-    dog.goTo();
+    dog.goTo(0, 0);
     dog.say('hello');
 
 

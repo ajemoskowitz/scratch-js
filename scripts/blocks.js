@@ -4,46 +4,27 @@ class Actor {
         this.width = element.width;
         this.direction = Number(this.element.dataset.angle);
         this.size = Number(this.element.dataset.size);
-        this.xPosition = (element.getBoundingClientRect().x + element.width / 2) - (window.innerWidth / 2);
-        this.yPosition = ((element.getBoundingClientRect().y + element.height / 2) - (window.innerHeight / 2)) * -1;
-        this.element.style.transform = `scale(${this.size / 100}) rotate(${this.direction - 90}deg)`;
+        this.scaleX = Number(this.element.dataset.scaleX);
+        this.xPosition = Math.round((element.getBoundingClientRect().x + element.getBoundingClientRect().width / 2) - (window.innerWidth / 2));
+        this.yPosition = Math.round(((element.getBoundingClientRect().y + element.getBoundingClientRect().height / 2) - (window.innerHeight / 2)) * -1);
+        this.element.style.transform = `scale(${this.size / 100}) rotate(${this.direction - 90}deg) scaleX(${this.scaleX})`;
     }
 
     move(steps=10) {
-        const currentAngle = this.getRotationAngle();
-        console.log("current angle: " + currentAngle);
-        console.log("sin function returns: " + Math.sin(currentAngle * Math.PI/180) * steps);
-        // this.changeXBy(Math.sin(currentAngle * Math.PI/180) * steps)
-        // this.changeYBy(Math.cos(currentAngle * Math.PI/180) * steps)
-        // this.element.style.left = Number(this.element.style.left.substr(0, this.element.style.left.length - 2)) + steps + "px"
+        let newX = this.xPosition + (steps * Math.sin(this.direction * (Math.PI / 180)));
+        let newY = this.yPosition + (steps * Math.cos(this.direction * (Math.PI / 180)));
+        this.goTo(newX, newY);
     }
 
-    getRotationAngle() {
-        const obj = window.getComputedStyle(this.element, null);
-        const matrix = obj.getPropertyValue('-webkit-transform') || 
-            obj.getPropertyValue('-moz-transform') ||
-            obj.getPropertyValue('-ms-transform') ||
-            obj.getPropertyValue('-o-transform') ||
-            obj.getPropertyValue('transform');
-
-        let angle = 0; 
-
-        if (matrix !== 'none') 
-        {
-            const values = matrix.split('(')[1].split(')')[0].split(',');
-            const a = values[0];
-            const b = values[1];
-            angle = Math.round(Math.atan2(b, a) * (180/Math.PI));
-        } 
-
-        return (angle < 0) ? angle +=360 : angle;
+    flip() {
+        this.element.dataset.scaleX = Number(this.element.dataset.scaleX) * -1;
     }
 
     turnClockwise(degrees=15) {
         this.element.dataset.angle = Number(this.element.dataset.angle) + degrees;
     }
 
-    turnCounterclockwise(degrees=15) {
+    turnCounterClockwise(degrees=15) {
         this.element.dataset.angle = Number(this.element.dataset.angle) - degrees;
     }
 
@@ -53,8 +34,8 @@ class Actor {
 
     goTo(x=0, y=0) {
         if (x === 'mouse') {
-            this.element.style.left = `${mouseX - this.width / 2}px`;
-            this.element.style.top = `${mouseY - this.width / 2}px`;
+            this.element.style.left = `${mouseX + (window.innerWidth / 2) - this.width / 2}px`;
+            this.element.style.top = `${mouseY - (window.innerHeight / 2) - this.height / 2}px`;
         } else if (x === 'random') {
             this.element.style.left = `${pickRandom(0, window.innerWidth)}px`;
             this.element.style.top = `${pickRandom(0, window.innerHeight)}px`;
@@ -82,14 +63,6 @@ class Actor {
 
     setYTo(y=0) {
         this.goTo(this.xPosition, y);
-    }
-
-    sleep(seconds=1) {
-        return new Promise(resolve => setTimeout(resolve, seconds * 1000));
-    }
-
-    async wait(seconds=1) {
-        await this.sleep(seconds);
     }
 
     async say(message='Hello!', seconds) {
@@ -124,8 +97,9 @@ class Actor {
         }
     }
 
-    setSizeBy(percent=100) {
-        this.width = this.width * percent / 100;
+    setSizeTo(num=100) {
+        if(num < 0) { num = 0; }
+        this.element.dataset.size = num;
     }
 
     show() {
@@ -136,30 +110,17 @@ class Actor {
         this.element.style.visibility = "hidden";
     }
 
-    async repeat(task, iterations=10) {
-        let counter = 1;
-        while(counter <= iterations) {
-            await this.sleep(.03);
-            task();
-            counter++;
-        }
-    }
-
-    createCloneOf(actor) {
+    createClone() {
         const clone = document.createElement('img');
 
         clone.classList.add('actor');
-        clone.src = actor.element.attributes.src.value;
-        console.log(actor.element.attributes.src.value)
-        clone.style.position = 'absolute';
+        clone.src = this.element.attributes.src.value;
         clone.style.left = this.element.getBoundingClientRect().x + "px";
         clone.style.top = this.element.getBoundingClientRect().y + "px";
         document.body.insertAdjacentElement('beforeend', clone);
-
-        return clone;
     }
 
-    whenThisSpriteClicked(task) {
+    whenClicked(task) {
         this.element.addEventListener('click', () => {
             task();
         })
@@ -217,6 +178,23 @@ class Actor {
     }
 }
 
+async function wait(seconds=1) {
+    return new Promise(resolve => setTimeout(resolve, seconds * 1000));
+}
+
+function resetTimer() {
+    timer  = 0;
+}
+
+async function repeat(task, iterations=10) {
+    let counter = 1;
+    while(counter <= iterations) {
+        await wait(.03);
+        task();
+        counter++;
+    }
+}
+
 function ask(question) {
     return prompt(question);
 }
@@ -253,4 +231,52 @@ async function whenPressed(key, task) {
 function playSound(sound) {
     const audio = new Audio(`./sounds/${sound}`);
     audio.play();
+}
+
+function join(s1='', s2='') {
+    return s1 + s2;
+}
+
+function letter(num, s) {
+    return s[num - 1];
+}
+
+function lengthOf(s='') {
+    return s.length;
+}
+
+String.prototype.contains = function (s) {
+    return this.includes(s);
+}
+
+Number.prototype.mod = function (num) {
+    return this % num;
+}
+
+function round(num) {
+    return Math.round(num);
+}
+
+function abs(num) {
+    return Math.abs(num);
+}
+
+function floor(num) {
+    return Math.floor(num);
+}
+
+function ceiling(num) {
+    return Math.ceil(num);
+}
+
+function sqrt(num) {
+    return Math.sqrt(num);
+}
+
+function sin(num) {
+    return Math.sin(num);
+}
+
+function cos(num) {
+    return Math.cos(num);
 }

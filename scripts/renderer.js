@@ -13,6 +13,7 @@ setInterval(() => {
         window[actor.id] = new Actor(actor); 
     })
 
+    timer += .01;
 
 
 }, 10)

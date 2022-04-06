@@ -1,21 +1,37 @@
+// these two lines prevent elements from being dragged when clicked
+document.body.ondragstart = function() { return false; }
+document.body.ondrop = function() { return false; }
+
 document.querySelectorAll('.actor').forEach(actor => {
     actor.style.position = "absolute";
     window[actor.id] = new Actor(actor); 
+    
     let sizeNode = document.createAttribute('data-size');
     sizeNode.value = '100';
+
     let angleNode = document.createAttribute('data-angle');
     angleNode.value = '90';
+
+    let scaleXNode = document.createAttribute('data-scale-x');
+    scaleXNode.value = '1';
+
     actor.attributes.setNamedItem(sizeNode);
     actor.attributes.setNamedItem(angleNode);
+    actor.attributes.setNamedItem(scaleXNode);
 })
 
+let timer = 0;
+let mouseDown = false;
 let mouseX;
 let mouseY;
 
 document.onmousemove = function (e) {
-    mouseX = e.x;
-    mouseY = e.y;
+    mouseX = e.x - (window.innerWidth / 2);
+    mouseY = (window.innerHeight / 2) - e.y;
 }
+
+document.onmousedown = function () { mouseDown = true }
+document.onmouseup = function () { mouseDown = false }
 
 document.body.style.overflow = "hidden";
 
