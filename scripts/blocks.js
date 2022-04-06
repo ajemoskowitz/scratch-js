@@ -7,8 +7,15 @@ class Actor {
         this.scaleX = Number(this.element.dataset.scaleX);
         this.xPosition = Math.round((element.getBoundingClientRect().x + element.getBoundingClientRect().width / 2) - (window.innerWidth / 2));
         this.yPosition = Math.round(((element.getBoundingClientRect().y + element.getBoundingClientRect().height / 2) - (window.innerHeight / 2)) * -1);
+        this.isGliding = (this.element.dataset.glide === 'true');
+        this.brightness = Number(this.element.dataset.brightness);
         this.element.style.transform = `scale(${this.size / 100}) rotate(${this.direction - 90}deg) scaleX(${this.scaleX})`;
+        this.element.style.filter = `brightness(${(this.brightness / 100) + 1})`
     }
+    
+    ////////////////////
+    // MOTION BLOCKS
+    ////////////////////
 
     move(steps=10) {
         let newX = this.xPosition + (steps * Math.sin(this.direction * (Math.PI / 180)));
@@ -20,11 +27,11 @@ class Actor {
         this.element.dataset.scaleX = Number(this.element.dataset.scaleX) * -1;
     }
 
-    turnClockwise(degrees=15) {
+    turnRight(degrees=15) {
         this.element.dataset.angle = Number(this.element.dataset.angle) + degrees;
     }
 
-    turnCounterClockwise(degrees=15) {
+    turnLeft(degrees=15) {
         this.element.dataset.angle = Number(this.element.dataset.angle) - degrees;
     }
 
@@ -49,6 +56,54 @@ class Actor {
         }
     }
 
+    glide(secs=1, x=0, y=0) {
+        if (!this.isGliding) {
+            if (x === 'mouse') {
+                this.element.dataset.glide = true;
+                let currentMouseX = mouseX;
+                let currentMouseY = mouseY;
+
+                this.element.animate([
+                    {
+                        left: this.element.style.left,
+                        top: this.element.style.top,
+                    },
+                    {
+                        left: `${currentMouseX + (window.innerWidth / 2) - this.width / 2}px`,
+                        top: `${currentMouseY - (window.innerHeight / 2) - this.height / 2}px`
+                    }
+                ], {
+                    duration: secs * 1000,
+                    iterations: 1
+                })
+
+                setTimeout(() => { this.element.dataset.glide = false; }, secs * 1000)
+
+                this.goTo(currentMouseX, currentMouseY);
+            } else {
+                this.element.dataset.glide = true;
+
+                this.element.animate([
+                    {
+                        left: this.element.style.left,
+                        top: this.element.style.top,
+                    },
+                    {
+                        left: `${(window.innerWidth / 2 - this.width / 2) + x}px`,
+                        top: `${(window.innerHeight / 2 - this.element.height / 2) - y}px`
+                    }
+                ], {
+                    duration: secs * 1000,
+                    iterations: 1
+                })
+
+                setTimeout(() => { this.element.dataset.glide = false; }, secs * 1000)
+
+                this.goTo(x, y);
+            }
+        }
+    }
+
     changeXBy(x=10) {
         this.element.style.left = `${this.element.getBoundingClientRect().x + x}px`;
     }
@@ -64,6 +119,10 @@ class Actor {
     setYTo(y=0) {
         this.goTo(this.xPosition, y);
     }
+
+    ////////////////////
+    // LOOKS BLOCKS
+    ////////////////////
 
     async say(message='Hello!', seconds) {
         document.querySelectorAll(`.message[data-actor=${this.element.id}]`).forEach(message => {
@@ -101,6 +160,19 @@ class Actor {
         if(num < 0) { num = 0; }
         this.element.dataset.size = num;
     }
+
+    // TODO
+    changeEffect(effect="brightness", degree=25){
+        this.element.dataset.brightness = Number(this.element.dataset.brightness) + degree;
+    }
+    
+    // TODO
+    setEffect(effect="brightness", degree=0){
+        this.element.dataset.brightness = degree;
+    }
+
+    // TODO
+    clearGraphicEffects(){}
 
     show() {
         this.element.style.visibility = "visible";

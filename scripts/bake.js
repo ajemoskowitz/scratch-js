@@ -4,6 +4,8 @@ document.body.ondrop = function() { return false; }
 
 document.querySelectorAll('.actor').forEach(actor => {
     actor.style.position = "absolute";
+    actor.style.top = "0px";
+    actor.style.left = "0px";
     window[actor.id] = new Actor(actor); 
     
     let sizeNode = document.createAttribute('data-size');
@@ -15,9 +17,17 @@ document.querySelectorAll('.actor').forEach(actor => {
     let scaleXNode = document.createAttribute('data-scale-x');
     scaleXNode.value = '1';
 
+    let glideNode = document.createAttribute('data-glide');
+    glideNode.value = 'false';
+
+    let brightnessNode = document.createAttribute('data-brightness');
+    brightnessNode.value = '0';
+
     actor.attributes.setNamedItem(sizeNode);
     actor.attributes.setNamedItem(angleNode);
     actor.attributes.setNamedItem(scaleXNode);
+    actor.attributes.setNamedItem(glideNode);
+    actor.attributes.setNamedItem(brightnessNode);
 })
 
 let timer = 0;
