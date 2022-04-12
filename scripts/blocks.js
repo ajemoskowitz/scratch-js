@@ -12,7 +12,7 @@ class Actor {
         this.element.style.transform = `scale(${this.size / 100}) rotate(${this.direction - 90}deg) scaleX(${this.scaleX})`;
         this.element.style.filter = `brightness(${(this.brightness / 100) + 1})`
     }
-    
+
     ////////////////////
     // MOTION BLOCKS
     ////////////////////
@@ -35,14 +35,9 @@ class Actor {
         this.element.dataset.angle = Number(this.element.dataset.angle) - degrees;
     }
 
-    pointInDirection(degrees=90) {
-        this.element.dataset.angle = degrees;
-    }
-
     goTo(x=0, y=0) {
         if (x === 'mouse') {
-            this.element.style.left = `${mouseX + (window.innerWidth / 2) - this.width / 2}px`;
-            this.element.style.top = `${mouseY - (window.innerHeight / 2) - this.height / 2}px`;
+            this.goTo(mouseX, mouseY);
         } else if (x === 'random') {
             this.element.style.left = `${pickRandom(0, window.innerWidth)}px`;
             this.element.style.top = `${pickRandom(0, window.innerHeight)}px`;
@@ -80,6 +75,50 @@ class Actor {
                 setTimeout(() => { this.element.dataset.glide = false; }, secs * 1000)
 
                 this.goTo(currentMouseX, currentMouseY);
+            } else if (x === 'random') {
+                // this.element.dataset.glide = true;
+                // let randomX = pickRandom(0, window.innerWidth);
+                // let randomY = pickRandom(0, window.innerHeight);
+
+                // this.element.animate([
+                //     {
+                //         left: this.element.style.left,
+                //         top: this.element.style.top,
+                //     },
+                //     {
+                //         left: `${randomX}px`,
+                //         top: `${randomY}px`
+                //     }
+                // ], {
+                //     duration: secs * 1000,
+                //     iterations: 1
+                // })
+
+                // setTimeout(() => { this.element.dataset.glide = false; }, secs * 1000)
+
+                // this.goTo(randomX + (window.innerWidth / 2) - this.width / 2, randomY - (window.innerHeight / 2) - this.height / 2);
+            } else if (typeof x == 'string') {
+                this.element.dataset.glide = true;
+                let currentSpriteX = window[x].xPosition;
+                let currentSpriteY = window[x].yPosition;
+
+                this.element.animate([
+                    {
+                        left: this.element.style.left,
+                        top: this.element.style.top,
+                    },
+                    {
+                        left: `${currentSpriteX + (window.innerWidth / 2) - this.width / 2}px`,
+                        top: `${currentSpriteY - (window.innerHeight / 2) - this.height / 2}px`
+                    }
+                ], {
+                    duration: secs * 1000,
+                    iterations: 1
+                })
+
+                setTimeout(() => { this.element.dataset.glide = false; }, secs * 1000)
+
+                this.goTo(currentSpriteX, currentSpriteY);
             } else {
                 this.element.dataset.glide = true;
 
@@ -101,6 +140,26 @@ class Actor {
 
                 this.goTo(x, y);
             }
+        }
+    }
+
+    pointInDirection(degrees=90) {
+        this.element.dataset.angle = degrees;
+    }
+
+    pointTowards(sprite) {
+        if (sprite == 'mouse' && mouseY >= this.yPosition) {
+            let newAngle = Math.asin((mouseX - this.xPosition) / (this.distanceTo('mouse'))) / (Math.PI / 180);
+            this.pointInDirection(newAngle);
+        } else if (sprite == 'mouse' && mouseY < this.yPosition) {
+            let newAngle = Math.asin((this.xPosition - mouseX) / this.distanceTo('mouse')) / (Math.PI / 180);            
+            this.pointInDirection(newAngle + 180);
+        } else if (window[sprite].yPosition >= this.yPosition) {
+            let newAngle = Math.asin((window[sprite].xPosition - this.xPosition) / (this.distanceTo(sprite))) / (Math.PI / 180);
+            this.pointInDirection(newAngle);
+        } else {
+            let newAngle = Math.asin((this.xPosition - window[sprite].xPosition) / this.distanceTo(sprite)) / (Math.PI / 180);            
+            this.pointInDirection(newAngle + 180);
         }
     }
 
@@ -134,9 +193,6 @@ class Actor {
         newMessage.classList.add('message');
         newMessage.setAttribute('data-actor', this.element.id);
         newMessage.innerText = message;
-        newMessage.style.position = 'relative';
-        newMessage.style.left = this.element.getBoundingClientRect().x - this.width / 2 + "px";
-        newMessage.style.top = this.element.getBoundingClientRect().y - this.element.height * 1.5  + "px";
         document.body.insertAdjacentElement('beforeend', newMessage);
 
         if(seconds) {
@@ -172,24 +228,20 @@ class Actor {
     }
 
     // TODO
-    clearGraphicEffects(){}
+    clearGraphicEffects(){
+        this.element.dataset.brightness = 0;
+    }
 
     show() {
-        this.element.style.visibility = "visible";
+        this.element.style.display = "block";
     }
 
     hide() {
-        this.element.style.visibility = "hidden";
+        this.element.style.display = "none";
     }
 
-    createClone() {
-        const clone = document.createElement('img');
-
-        clone.classList.add('actor');
-        clone.src = this.element.attributes.src.value;
-        clone.style.left = this.element.getBoundingClientRect().x + "px";
-        clone.style.top = this.element.getBoundingClientRect().y + "px";
-        document.body.insertAdjacentElement('beforeend', clone);
+    whenIStartAsAClone(task) {
+        this.element.dataset.cloneStart = task;
     }
 
     whenClicked(task) {
@@ -223,6 +275,10 @@ class Actor {
         },10)
     }
 
+    ////////////////////
+    // SENSING BLOCKS
+    ////////////////////
+
     isTouching(object) {
         if (object === 'mouse') {
             const withinX = mouseX >= this.element.getBoundingClientRect().x && mouseX <= this.element.getBoundingClientRect().x + this.element.width;
@@ -247,6 +303,53 @@ class Actor {
             
             return overlap;
         }
+    }
+
+    distanceTo(sprite='mouse') {
+        if (sprite == 'mouse') {
+            return Math.sqrt((mouseX - this.xPosition) ** 2 + (mouseY - this.yPosition) ** 2)
+        } else {
+            return Math.sqrt((window[sprite].xPosition - this.xPosition) ** 2 + (window[sprite].yPosition - this.yPosition) ** 2)
+        }
+    }
+}
+
+////////////////////
+// GLOBAL BLOCKS
+////////////////////
+////////////////////
+// GLOBAL BLOCKS
+////////////////////
+////////////////////
+// GLOBAL BLOCKS
+////////////////////
+
+function keyPressed(key) {
+    if (key === 'shift') {
+        return keyEvent.shiftKey;
+    } else if (key === 'any') {
+        return activeKeys.length > 0;
+    } else {
+        return activeKeys.includes(keyConversions[key]);
+    }
+}
+
+function createClone(sprite) {
+    let clone = window[sprite].element.cloneNode();
+    clone.id = 'clone' + pickRandom(10000000, 99999999);
+
+    let cloneNode = document.createAttribute('data-clone');
+    cloneNode.value = window[sprite].element.id;
+
+    clone.attributes.setNamedItem(cloneNode);
+
+    document.body.querySelector('script').insertAdjacentElement('beforebegin', clone);
+
+    window[clone.id] = new Actor(clone); 
+
+    clone.onload = function () {
+        // window[clone.id].say('hi there!!!!')
+        window[sprite].element.dataset.cloneStart;
     }
 }
 

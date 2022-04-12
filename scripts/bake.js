@@ -4,8 +4,8 @@ document.body.ondrop = function() { return false; }
 
 document.querySelectorAll('.actor').forEach(actor => {
     actor.style.position = "absolute";
-    actor.style.top = "0px";
-    actor.style.left = "0px";
+    actor.style.top = actor.getBoundingClientRect().y;
+    actor.style.left = actor.getBoundingClientRect().x;
     window[actor.id] = new Actor(actor); 
     
     let sizeNode = document.createAttribute('data-size');
@@ -23,17 +23,35 @@ document.querySelectorAll('.actor').forEach(actor => {
     let brightnessNode = document.createAttribute('data-brightness');
     brightnessNode.value = '0';
 
+    let cloneFunction = document.createAttribute('data-clone-start');
+
     actor.attributes.setNamedItem(sizeNode);
     actor.attributes.setNamedItem(angleNode);
     actor.attributes.setNamedItem(scaleXNode);
     actor.attributes.setNamedItem(glideNode);
     actor.attributes.setNamedItem(brightnessNode);
+    actor.attributes.setNamedItem(cloneFunction);
 })
 
 let timer = 0;
 let mouseDown = false;
 let mouseX;
 let mouseY;
+let keyEvent = {};
+let activeKeys = [];
+
+document.addEventListener('keydown', e => {
+    keyEvent = e;
+    if(!activeKeys.includes(e.key)) {
+        activeKeys.push(e.key);
+    }
+});
+
+document.addEventListener('keyup', e => {
+    keyEvent = {};
+    const keyIndex = activeKeys.indexOf(e.key);
+    activeKeys.splice(keyIndex, 1);
+});
 
 document.onmousemove = function (e) {
     mouseX = e.x - (window.innerWidth / 2);
@@ -87,7 +105,8 @@ const keyConversions = {
     'right arrow': 'ArrowRight',
     'left arrow': 'ArrowLeft',
     'up arrow': 'ArrowUp',
-    'down arrow': 'ArrowDown'
+    'down arrow': 'ArrowDown',
+    'shift': 'Shift'
 }
 
 const globalMessages = []

@@ -1,27 +1,50 @@
+#arrowRight {
+    right: 10px;
+}
+
+#arrowLeft {
+    left: 10px;
+}
+
+#arrowDown {
+    left: 500px;
+}
+
+#arrowUp {
+    right: 500px;
+}
+
+#arrowUp, #arrowDown {
+    bottom: -200px;
+}
+
+#arrowRight, #arrowLeft {
+    bottom: -150px;
+}
+
+#arrowLeftPlayer, #arrowLeftGoal {
+    left: 10px;
+}
+
+#arrowLeftGoal {
+    bottom: -500px;
+}
+
 #stage {
-    background-size: cover;
-    background-image: url('backdrops/aurora.jpg');
-}
-
-#leftArrow {
-    left: 0px;
-    top: 0px;
-}
-
-#rightArrow {
-    left: 100px;
-    top: -3px;
+    width: 90vw;
+    height: auto;
+    margin: auto;
+    margin-top: 10px;
+    aspect-ratio: 16 / 9;
 }
 
 /* other styles -- you can ignore these */
-#start {
-    height: 50px;
-    width: 100vw;
-    background-color: white;
-    position: fixed;
-    top: 0px;
-    z-index: 1000;
-    border-bottom: 2px solid black;
+body {
+    margin: 0;
+    height: 100vh;
+    background-color: black;
+    background-size: cover;
+    background: url('./backdrops/aurora.jpg');
 }
 
 .message {
