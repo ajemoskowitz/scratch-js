@@ -256,7 +256,7 @@ class Actor {
             id: randId,
             message: message
         });
-        await this.wait(5);
+        await wait(5);
         globalMessages.forEach((object, i) => {
             if (object.id === randId) {
                 globalMessages.splice(i, 1);
