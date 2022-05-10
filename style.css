@@ -1,33 +1,9 @@
-#arrowRight {
-    right: 10px;
-}
-
-#arrowLeft {
-    left: 10px;
-}
-
-#arrowDown {
-    left: 500px;
-}
-
-#arrowUp {
-    right: 500px;
-}
-
-#arrowUp, #arrowDown {
-    bottom: -200px;
-}
-
-#arrowRight, #arrowLeft {
-    bottom: -150px;
-}
-
-#arrowLeftPlayer, #arrowLeftGoal {
-    left: 10px;
-}
-
-#arrowLeftGoal {
-    bottom: -500px;
+.pixel {
+    height: 10px;
+    width: 10px;
+    background: chocolate;
+    position: absolute;
+    border-radius: 50%;
 }
 
 #stage {
