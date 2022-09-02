@@ -42,6 +42,7 @@ class Actor {
             this.element.style.left = `${pickRandom(0, window.innerWidth)}px`;
             this.element.style.top = `${pickRandom(0, window.innerHeight)}px`;
         } else if (typeof x === 'string') {
+            // TO DO?
             const objectToAttach = document.getElementById(x).getBoundingClientRect();
             this.element.style.left = `${window.innerWidth / 2 - this.width / 2 + x}px`;
             this.element.style.top = `${window.innerHeight / 2 - this.element.height / 2 - y}px`;
@@ -76,27 +77,39 @@ class Actor {
 
                 this.goTo(currentMouseX, currentMouseY);
             } else if (x === 'random') {
-                // this.element.dataset.glide = true;
-                // let randomX = pickRandom(0, window.innerWidth);
-                // let randomY = pickRandom(0, window.innerHeight);
+                this.element.dataset.glide = true;
+                let randomX = pickRandom(0, window.innerWidth);
+                let randomY = pickRandom(0, window.innerHeight);
 
-                // this.element.animate([
-                //     {
-                //         left: this.element.style.left,
-                //         top: this.element.style.top,
-                //     },
-                //     {
-                //         left: `${randomX}px`,
-                //         top: `${randomY}px`
-                //     }
-                // ], {
-                //     duration: secs * 1000,
-                //     iterations: 1
-                // })
+                this.element.animate([
+                    {
+                        left: this.element.style.left,
+                        top: this.element.style.top,
+                    },
+                    {
+                        left: `${randomX}px`,
+                        top: `${randomY}px`
+                    }
+                ], {
+                    duration: secs * 1000,
+                    iterations: 1
+                })
 
-                // setTimeout(() => { this.element.dataset.glide = false; }, secs * 1000)
+                if (randomX > window.innerWidth / 2) {
+                    randomX = (window.innerWidth / 2) + randomX / 2
+                } else {
+                    randomX = (window.innerWidth / 2) - randomX / 2
+                }
 
-                // this.goTo(randomX + (window.innerWidth / 2) - this.width / 2, randomY - (window.innerHeight / 2) - this.height / 2);
+                if (randomY > window.innerHeight / 2) {
+                    randomY = (window.innerHeight / 2) + randomY / 2
+                } else {
+                    randomY = (window.innerHeight / 2) - randomY / 2
+                }
+
+                setTimeout(() => { this.element.dataset.glide = false; }, secs * 1000)
+
+                this.goTo(randomX, randomY);
             } else if (typeof x == 'string') {
                 this.element.dataset.glide = true;
                 let currentSpriteX = window[x].xPosition;
