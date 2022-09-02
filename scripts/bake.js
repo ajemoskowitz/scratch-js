@@ -7,6 +7,8 @@ document.querySelectorAll('.actor').forEach(actor => {
     actor.style.top = actor.getBoundingClientRect().y;
     actor.style.left = actor.getBoundingClientRect().x;
     window[actor.id] = new Actor(actor); 
+
+    let yWindowNode = document.createAttribute('data-window-y');
     
     let sizeNode = document.createAttribute('data-size');
     sizeNode.value = '100';
@@ -25,6 +27,7 @@ document.querySelectorAll('.actor').forEach(actor => {
 
     let cloneFunction = document.createAttribute('data-clone-start');
 
+    actor.attributes.setNamedItem(yWindowNode);
     actor.attributes.setNamedItem(sizeNode);
     actor.attributes.setNamedItem(angleNode);
     actor.attributes.setNamedItem(scaleXNode);

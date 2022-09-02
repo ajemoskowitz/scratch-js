@@ -1,8 +1,10 @@
 class Actor {
     constructor(element) {
         this.element = element;
+        this.height = element.height;
         this.width = element.width;
         this.direction = Number(this.element.dataset.angle);
+        this.windowY = Number(this.element.dataset.windowY);
         this.size = Number(this.element.dataset.size);
         this.scaleX = Number(this.element.dataset.scaleX);
         this.xPosition = Math.round((element.getBoundingClientRect().x + element.getBoundingClientRect().width / 2) - (window.innerWidth / 2));
@@ -42,7 +44,6 @@ class Actor {
             this.element.style.left = `${pickRandom(0, window.innerWidth)}px`;
             this.element.style.top = `${pickRandom(0, window.innerHeight)}px`;
         } else if (typeof x === 'string') {
-            // TO DO?
             const objectToAttach = document.getElementById(x).getBoundingClientRect();
             this.element.style.left = `${window.innerWidth / 2 - this.width / 2 + x}px`;
             this.element.style.top = `${window.innerHeight / 2 - this.element.height / 2 - y}px`;
@@ -77,39 +78,27 @@ class Actor {
 
                 this.goTo(currentMouseX, currentMouseY);
             } else if (x === 'random') {
-                this.element.dataset.glide = true;
-                let randomX = pickRandom(0, window.innerWidth);
-                let randomY = pickRandom(0, window.innerHeight);
+                // this.element.dataset.glide = true;
+                // let randomX = pickRandom(0, window.innerWidth);
+                // let randomY = pickRandom(0, window.innerHeight);
 
-                this.element.animate([
-                    {
-                        left: this.element.style.left,
-                        top: this.element.style.top,
-                    },
-                    {
-                        left: `${randomX}px`,
-                        top: `${randomY}px`
-                    }
-                ], {
-                    duration: secs * 1000,
-                    iterations: 1
-                })
+                // this.element.animate([
+                //     {
+                //         left: this.element.style.left,
+                //         top: this.element.style.top,
+                //     },
+                //     {
+                //         left: `${randomX}px`,
+                //         top: `${randomY}px`
+                //     }
+                // ], {
+                //     duration: secs * 1000,
+                //     iterations: 1
+                // })
 
-                if (randomX > window.innerWidth / 2) {
-                    randomX = (window.innerWidth / 2) + randomX / 2
-                } else {
-                    randomX = (window.innerWidth / 2) - randomX / 2
-                }
+                // setTimeout(() => { this.element.dataset.glide = false; }, secs * 1000)
 
-                if (randomY > window.innerHeight / 2) {
-                    randomY = (window.innerHeight / 2) + randomY / 2
-                } else {
-                    randomY = (window.innerHeight / 2) - randomY / 2
-                }
-
-                setTimeout(() => { this.element.dataset.glide = false; }, secs * 1000)
-
-                this.goTo(randomX, randomY);
+                // this.goTo(randomX + (window.innerWidth / 2) - this.width / 2, randomY - (window.innerHeight / 2) - this.height / 2);
             } else if (typeof x == 'string') {
                 this.element.dataset.glide = true;
                 let currentSpriteX = window[x].xPosition;
@@ -181,7 +170,11 @@ class Actor {
     }
 
     changeYBy(y=10) {
-        this.element.style.top = `${this.element.getBoundingClientRect().y - y}px`;
+        if (this.size > 100) {
+            this.element.style.top = `${this.windowY - y}px`;
+        } else {
+            this.element.style.top = `${this.windowY - y}px`;
+        }
     }
 
     setXTo(x=0) {
@@ -209,7 +202,7 @@ class Actor {
         document.body.insertAdjacentElement('beforeend', newMessage);
 
         if(seconds) {
-            await this.wait(seconds)
+            await wait(seconds)
 
             document.querySelectorAll(`.message[data-actor=${this.element.id}]`).forEach(message => {
                 message.parentNode.removeChild(message);
