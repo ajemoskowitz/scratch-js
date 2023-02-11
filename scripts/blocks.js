@@ -1,4 +1,199 @@
+Last login: Fri Feb 10 18:20:04 on ttys002
+ty@seth-the-cat sratch-js-tester % npm start
+
+> sratch-js-tester@1.0.0 start
+> electron-forge start
+
+✔ Checking your system
+✔ Locating application
+✔ Loading configuration
+✔ Preparing native dependencies [0.2s]
+✔ Running generateAssets hook
+
+ty@seth-the-cat sratch-js-tester % security find-identity -p codesigning -v
+     0 valid identities found
+ty@seth-the-cat sratch-js-tester % cd ../
+ty@seth-the-cat ~ % cd documents
+ty@seth-the-cat documents % gh repo clone ajemoskowitz/scratch-js
+zsh: command not found: gh
+ty@seth-the-cat documents % git repo clone ajemoskowitz/scratch-js
+git: 'repo' is not a git command. See 'git --help'.
+
+The most similar commands are
+	grep
+	reflog
+	remote
+	repack
+ty@seth-the-cat documents % git
+usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]
+           [--exec-path[=<path>]] [--html-path] [--man-path] [--info-path]
+           [-p | --paginate | -P | --no-pager] [--no-replace-objects] [--bare]
+           [--git-dir=<path>] [--work-tree=<path>] [--namespace=<name>]
+           [--super-prefix=<path>] [--config-env=<name>=<envvar>]
+           <command> [<args>]
+
+These are common Git commands used in various situations:
+
+start a working area (see also: git help tutorial)
+   clone     Clone a repository into a new directory
+   init      Create an empty Git repository or reinitialize an existing one
+
+work on the current change (see also: git help everyday)
+   add       Add file contents to the index
+   mv        Move or rename a file, a directory, or a symlink
+   restore   Restore working tree files
+   rm        Remove files from the working tree and from the index
+
+examine the history and state (see also: git help revisions)
+   bisect    Use binary search to find the commit that introduced a bug
+   diff      Show changes between commits, commit and working tree, etc
+   grep      Print lines matching a pattern
+   log       Show commit logs
+   show      Show various types of objects
+   status    Show the working tree status
+
+grow, mark and tweak your common history
+   branch    List, create, or delete branches
+   commit    Record changes to the repository
+   merge     Join two or more development histories together
+   rebase    Reapply commits on top of another base tip
+   reset     Reset current HEAD to the specified state
+   switch    Switch branches
+   tag       Create, list, delete or verify a tag object signed with GPG
+
+collaborate (see also: git help workflows)
+   fetch     Download objects and refs from another repository
+   pull      Fetch from and integrate with another repository or a local branch
+   push      Update remote refs along with associated objects
+
+'git help -a' and 'git help -g' list available subcommands and some
+concept guides. See 'git help <command>' or 'git help <concept>'
+to read about a specific subcommand or concept.
+See 'git help git' for an overview of the system.
+ty@seth-the-cat documents % git clone ajemoskowitz/scratch-js
+fatal: repository 'ajemoskowitz/scratch-js' does not exist
+ty@seth-the-cat documents % git fetch ajemoskowitz/scratch-js
+fatal: not a git repository (or any of the parent directories): .git
+ty@seth-the-cat documents % brew install gh
+Running `brew update --auto-update`...
+==> Auto-updated Homebrew!
+Updated 3 taps (homebrew/cask-versions, homebrew/core and homebrew/cask).
+==> New Formulae
+spek                                     symlinks                                 touca                                    youplot                                  zsh-autocomplete
+==> New Casks
+egnyte
+
+You have 13 outdated formulae and 2 outdated casks installed.
+You can upgrade them with brew upgrade
+or list them with brew outdated.
+
+==> Fetching gh
+==> Downloading https://ghcr.io/v2/homebrew/core/gh/manifests/2.23.0
+######################################################################## 100.0%
+  UW PICO 5.09                                                                                         New Buffer
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                             [ Read 463 lines ]
+^G Get Help                       ^O WriteOut                       ^R Read File                      ^Y Prev Pg                        ^K Cut Text                       ^C Cur Pos
+^X Exit                           ^J Justify                        ^W Where is                       ^V Next Pg                        ^U UnCut Text                     ^T To Spell
+  UW PICO 5.09                                                                                      File: blocks.js
+
 class Actor {
+    constructor(element) {
+        this.element = element;
+        this.height = element.height;
+        this.width = element.width;
+        this.direction = Number(this.element.dataset.angle);
+        this.windowY = Number(this.element.dataset.windowY);
+        this.size = Number(this.element.dataset.size);
+        this.scaleX = Number(this.element.dataset.scaleX);
+        this.xPosition = Math.round((element.getBoundingClientRect().x + element.getBoundingClientRect().width / 2) - (window.innerWidth / 2));
+        this.yPosition = Math.round(((element.getBoundingClientRect().y + element.getBoundingClientRect().height / 2) - (window.innerHeight / 2)) * -1);
+        this.isGliding = (this.element.dataset.glide === 'true');
+        this.brightness = Number(this.element.dataset.brightness);
+        this.element.style.transform = `scale(${this.size / 100}) rotate(${this.direction - 90}deg) scaleX(${this.scaleX})`;
+        this.element.style.filter = `brightness(${(this.brightness / 100) + 1})`
+    }
+
+    ////////////////////
+    // MOTION BLOCKS
+    ////////////////////
+
+    move(steps=10) {
+        let newX = this.xPosition + (steps * Math.sin(this.direction * (Math.PI / 180)));
+        let newY = this.yPosition + (steps * Math.cos(this.direction * (Math.PI / 180)));
+        this.goTo(newX, newY);
+    }
+
+    flip() {
+        this.element.dataset.scaleX = Number(this.element.dataset.scaleX) * -1;
+    }
+
+    turnRight(degrees=15) {
+        this.element.dataset.angle = Number(this.element.dataset.angle) + degrees;
+    }
+
+    turnLeft(degrees=15) {
+        this.element.dataset.angle = Number(this.element.dataset.angle) - degrees;
+    }
+
+    goTo(x=0, y=0) {
+        if (x === 'mouse') {
+            this.goTo(mouseX, mouseY);
+        } else if (x === 'random') {
+            this.element.style.left = `${pickRandom(0, window.innerWidth)}px`;
+            this.element.style.top = `${pickRandom(0, window.innerHeight)}px`;
+        } else if (typeof x === 'string') {
+            const objectToAttach = document.getElementById(x).getBoundingClientRect();
+
+^G Get Help                       ^O WriteOut                       ^R Read File                      ^Y Prev Pg                        ^K Cut Text                       ^C Cur Pos
+^X Exit                           ^J Justify                        ^W Where is                       ^V Next Pg                        ^U UnCut Text                     ^T To Spellclass Actor {
     constructor(element) {
         this.element = element;
         this.height = element.height;
