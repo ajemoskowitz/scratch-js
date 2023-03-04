@@ -248,8 +248,12 @@ class Actor {
                 message.parentNode.removeChild(message);
             })
         }
-        //if(document.addEventListener('keydown', ))
-    }
+        document.addEventListener('keydown', e => {
+            if (e.key == 'Enter') {
+                document.querySelectorAll(`.message[data-actor=${this.element.id}]`).forEach(message => {
+                    message.parentNode.removeChild(message);
+                })}})
+        }
     
 
     changeSizeBy(num=10) {

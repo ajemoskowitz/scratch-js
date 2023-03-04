@@ -4,7 +4,9 @@ async function startGame() {
 
 
     dog.goTo(0, 0)
-    
+    whenPressed('j', () => {
+        dog.say('Bark!')
+    })
     // 👆 WRITE YOUR CODE ABOVE THIS PART 👆
     // 🛑 STOP 🛑
 }
