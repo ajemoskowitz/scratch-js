@@ -233,6 +233,14 @@ class Actor {
         newMessage.innerText = message;
         document.body.insertAdjacentElement('beforeend', newMessage);
 
+        document.querySelectorAll('.message').forEach(message => {
+            const actor = document.getElementById(message.dataset.actor);
+            message.style.position = "absolute";
+            message.style.left = actor.getBoundingClientRect().x + "px";
+            message.style.top = actor.getBoundingClientRect().y + "px";
+        })
+
+
         if(seconds) {
             await wait(seconds)
 
@@ -240,7 +248,9 @@ class Actor {
                 message.parentNode.removeChild(message);
             })
         }
+        //if(document.addEventListener('keydown', ))
     }
+    
 
     changeSizeBy(num=10) {
         if (this.size + num <= 0) {

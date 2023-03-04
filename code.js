@@ -4,8 +4,7 @@ async function startGame() {
 
 
     dog.goTo(0, 0)
-
-
+    
     // 👆 WRITE YOUR CODE ABOVE THIS PART 👆
     // 🛑 STOP 🛑
 }
